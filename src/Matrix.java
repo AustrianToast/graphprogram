@@ -8,11 +8,11 @@ public class Matrix {
     
     }
 
-    public String[] importCSV() {
+    public String[] importCSV(String file) {
         String[] result = null;
         String line;
         try {
-            BufferedReader br = new BufferedReader(new FileReader(""));
+            BufferedReader br = new BufferedReader(new FileReader(file));
             
             line = br.readLine();
 
