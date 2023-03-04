@@ -4,12 +4,14 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Matrix {
+    private String[] result;
+    
     public static void main(String[] args) {
     
     }
 
     public String[] importCSV(String file) {
-        String[] result = new String[100];
+        result = new String[100];
         String line;
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
