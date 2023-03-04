@@ -25,4 +25,8 @@ public class Matrix {
         }
         return result;
     }
+
+    public void printCSV() {
+        
+    }
 }
