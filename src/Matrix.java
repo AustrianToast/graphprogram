@@ -9,22 +9,19 @@ public class Matrix {
     }
 
     public String[] importCSV(String file) {
-        String[] result = null;
-        String line;
+        String[] result = new String[100];
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
-            
-            line = br.readLine();
 
-            while (line != null) {
-                result = line.trim().split(";");
+            while (br.readLine() != null) {
+                result = br.readLine().trim().split(";");
             }
             
             br.close();
 		} catch (FileNotFoundException e) {
-			e.getStackTrace();
+			e.printStackTrace();
         } catch (IOException e) {
-            e.getStackTrace();
+            e.printStackTrace();
         }
         return result;
     }
