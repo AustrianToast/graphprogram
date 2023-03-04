@@ -10,11 +10,12 @@ public class Matrix {
 
     public String[] importCSV(String file) {
         String[] result = new String[100];
+        String line;
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
 
-            while (br.readLine() != null) {
-                result = br.readLine().trim().split(";");
+            while ((line = br.readLine()) != null) {
+                result = line.trim().split(";");
             }
             
             br.close();
