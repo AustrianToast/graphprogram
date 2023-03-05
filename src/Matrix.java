@@ -4,32 +4,39 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Matrix {
-    private String[] result;
-    
+    private String[][] matrix;
     public static void main(String[] args) {
     
     }
 
-    public String[] importCSV(String file) {
-        result = new String[100];
-        String line;
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
+    public String[][] importCSV(String file) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line = br.readLine();
+            int rowCount = 0;
+            int columnCount = line.split(";").length;
 
-            while ((line = br.readLine()) != null) {
-                result = line.trim().split(";");
+            while (line != null) {
+                line = br.readLine();
+                rowCount++;
             }
-            
+
+            matrix = new String[rowCount][columnCount];
+
             br.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return result;
+        return matrix;
     }
 
     public void printCSV() {
-        
+        for(int i=0; i < matrix.length; i++) {
+            for(int j=0; j < matrix[i].length; j++) {
+                System.out.print(matrix[i][j]);
+            }
+            System.out.println();
+        }
     }
 }

@@ -7,6 +7,6 @@ public class TestMatrix {
         Matrix m = new Matrix();
 
         m.importCSV("/home/satan/bin/graphprogram/graph.csv");
-        System.out.println(m);
+        m.printCSV();;
     }
 }
