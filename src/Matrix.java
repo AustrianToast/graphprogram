@@ -1,42 +1,49 @@
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
 
 public class Matrix {
-    private String[][] matrix;
-    public static void main(String[] args) {
-    
+    private int[][] matrix;
+
+    public static void main(String[] args) {}
+
+    public Matrix(String file) {
+        matrix = this.readCSV(file);
     }
 
-    public String[][] importCSV(String file) {
+    public int[][] readCSV(String file){
+        int[][] intMatrix = null;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line = br.readLine();
-            int rowCount = 0;
-            int columnCount = line.split(";").length;
+            int rowCount = line.trim().split(";").length;
+            int columnCount = rowCount;
+            String[] lineArray = null;
 
-            while (line != null) {
-                line = br.readLine();
-                rowCount++;
+            intMatrix = new int[rowCount][columnCount];
+
+            for(int columnIndex = 0; line != null && columnIndex < intMatrix.length; columnIndex++, line = br.readLine()) {
+                lineArray = line.trim().split(";");
+                for(int rowIndex=0; rowIndex < intMatrix[columnIndex].length; rowIndex++) {
+                    intMatrix[columnIndex][rowIndex] = Integer.parseInt(lineArray[rowIndex]);
+                }
             }
-
-            matrix = new String[rowCount][columnCount];
-
             br.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return matrix;
+        return intMatrix;
     }
 
-    public void printCSV() {
-        for(int i=0; i < matrix.length; i++) {
-            for(int j=0; j < matrix[i].length; j++) {
-                System.out.print(matrix[i][j]);
+    public void print() {
+        for(int columnIndex=0; columnIndex < matrix.length; columnIndex++) {
+            for(int rowIndex=0; rowIndex < matrix[columnIndex].length; rowIndex++) {
+                System.out.print(matrix[columnIndex][rowIndex]);
             }
             System.out.println();
         }
     }
+
 }

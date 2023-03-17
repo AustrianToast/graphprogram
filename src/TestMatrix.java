@@ -1,12 +1,11 @@
 public class TestMatrix {
     public static void main(String[] args) {
-        testImportCSV();
+        test1("");
     }
 
-    public static void testImportCSV() {
-        Matrix m = new Matrix();
+    public static void test1(String file) {
+        Matrix matrix = new Matrix(file);
 
-        m.importCSV("/home/satan/bin/graphprogram/graph.csv");
-        m.printCSV();;
+        matrix.print();
     }
 }
