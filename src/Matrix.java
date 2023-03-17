@@ -8,8 +8,59 @@ public class Matrix {
 
     public static void main(String[] args) {}
 
+    public Matrix(int rowLength, int columnLength) {
+        matrix = new int[rowLength][columnLength];
+    }
+
     public Matrix(String file) {
         matrix = this.readCSV(file);
+    }
+
+    public Matrix multiply( Matrix m) {
+        Matrix scalarProduct = null;
+        
+        if(this.columnLength() != m.rowLength()) {
+            return scalarProduct;
+        }
+
+        scalarProduct = new Matrix(this.rowLength(), m.columnLength());
+
+        for(int columnIndex = 0; columnIndex < this.columnLength(); columnIndex++) {
+            for(int rowIndex = 0; rowIndex < m.rowLength(); rowIndex++) {
+                int sum = 0;
+                for(int k=0; k < this.rowLength(); k++) {
+                    sum += this.getValue(columnIndex, k) * m.getValue(k, rowIndex);
+                }
+                scalarProduct.insert(columnIndex, rowIndex, sum);
+            }
+        }
+
+        return scalarProduct;
+    }
+    
+    public int rowLength() {
+        return matrix.length;
+    }
+
+    public int columnLength() {
+        return matrix[0].length;
+    }
+
+    public int getValue(int columnIndex, int rowIndex) {
+        return matrix[columnIndex][rowIndex];
+    }
+
+    public void insert(int columnIndex, int rowIndex, int value) {
+        matrix[rowIndex][columnIndex] = value;
+    }
+
+    public void print() {
+        for(int columnIndex=0; columnIndex < matrix.length; columnIndex++) {
+            for(int rowIndex=0; rowIndex < matrix[columnIndex].length; rowIndex++) {
+                System.out.print(matrix[columnIndex][rowIndex]);
+            }
+            System.out.println();
+        }
     }
 
     public int[][] readCSV(String file){
@@ -19,7 +70,7 @@ public class Matrix {
             int rowCount = line.trim().split(";").length;
             int columnCount = rowCount;
             String[] lineArray = null;
-
+            
             intMatrix = new int[rowCount][columnCount];
 
             for(int columnIndex = 0; line != null && columnIndex < intMatrix.length; columnIndex++, line = br.readLine()) {
@@ -35,15 +86,6 @@ public class Matrix {
             e.printStackTrace();
         }
         return intMatrix;
-    }
-
-    public void print() {
-        for(int columnIndex=0; columnIndex < matrix.length; columnIndex++) {
-            for(int rowIndex=0; rowIndex < matrix[columnIndex].length; rowIndex++) {
-                System.out.print(matrix[columnIndex][rowIndex]);
-            }
-            System.out.println();
-        }
     }
 
 }
