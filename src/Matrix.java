@@ -5,78 +5,71 @@ import java.io.FileNotFoundException;
 
 public class Matrix {
     private int[][] matrix;
+    private int rowLength;
+    private int columnLength;
 
     public static void main(String[] args) {}
 
+    public Matrix(String file) {
+        readCSV(file);
+    }
+
     public Matrix(int rowLength, int columnLength) {
         matrix = new int[rowLength][columnLength];
+        this.rowLength = rowLength;
+        this.columnLength = columnLength;
     }
 
-    public Matrix(String file) {
-        matrix = this.readCSV(file);
+    public Matrix(int[][] matrix) {
+        this.matrix = matrix;
+        rowLength = matrix.length;
+        columnLength = rowLength;
     }
 
-    public Matrix multiply( Matrix m) {
-        Matrix scalarProduct = null;
-        
-        if(this.columnLength() != m.rowLength()) {
-            return scalarProduct;
-        }
+    public Matrix multiply(Matrix m) {
+        Matrix scalarProduct = new Matrix(new int[rowLength][m.columnLength]);
 
-        scalarProduct = new Matrix(this.rowLength(), m.columnLength());
-
-        for(int columnIndex = 0; columnIndex < this.columnLength(); columnIndex++) {
-            for(int rowIndex = 0; rowIndex < m.rowLength(); rowIndex++) {
+        for(int columnIndex = 0; columnIndex < this.getColumnLength(); columnIndex++) {
+            for(int rowIndex = 0; rowIndex < m.getRowLength(); rowIndex++) {
                 int sum = 0;
-                for(int k=0; k < this.rowLength(); k++) {
-                    sum += this.getValue(columnIndex, k) * m.getValue(k, rowIndex);
+                for(int k=0; k < this.getRowLength(); k++) {
+                    sum += this.getValueAt(rowIndex, k) * m.getValueAt(k, columnIndex);
                 }
-                scalarProduct.insert(columnIndex, rowIndex, sum);
+                scalarProduct.insert(rowIndex, columnIndex, sum);
             }
         }
-
         return scalarProduct;
     }
     
-    public int rowLength() {
-        return matrix.length;
+    public int getRowLength() {
+        return rowLength;
     }
 
-    public int columnLength() {
-        return matrix[0].length;
+    public int getColumnLength() {
+        return columnLength;
     }
 
-    public int getValue(int columnIndex, int rowIndex) {
-        return matrix[columnIndex][rowIndex];
+    public int getValueAt(int rowIndex, int columnIndex) {
+        return matrix[rowIndex][columnIndex];
     }
 
-    public void insert(int columnIndex, int rowIndex, int value) {
+    public void insert(int rowIndex, int columnIndex, int value) {
         matrix[rowIndex][columnIndex] = value;
     }
 
-    public void print() {
-        for(int columnIndex=0; columnIndex < matrix.length; columnIndex++) {
-            for(int rowIndex=0; rowIndex < matrix[columnIndex].length; rowIndex++) {
-                System.out.print(matrix[columnIndex][rowIndex]);
-            }
-            System.out.println();
-        }
-    }
-
-    public int[][] readCSV(String file){
-        int[][] intMatrix = null;
+    public void readCSV(String file){
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line = br.readLine();
-            int rowCount = line.trim().split(";").length;
-            int columnCount = rowCount;
+            rowLength = line.trim().split(";").length;
+            columnLength = rowLength;
             String[] lineArray = null;
             
-            intMatrix = new int[rowCount][columnCount];
+            matrix = new int[rowLength][columnLength];
 
-            for(int columnIndex = 0; line != null && columnIndex < intMatrix.length; columnIndex++, line = br.readLine()) {
-                lineArray = line.trim().split(";");
-                for(int rowIndex=0; rowIndex < intMatrix[columnIndex].length; rowIndex++) {
-                    intMatrix[columnIndex][rowIndex] = Integer.parseInt(lineArray[rowIndex]);
+            for(int columnIndex = 0; line != null && columnIndex < matrix.length; columnIndex++, line = br.readLine()) {
+                lineArray = line.split(";");
+                for(int rowIndex=0; rowIndex < matrix[columnIndex].length; rowIndex++) {
+                    matrix[rowIndex][columnIndex] = Integer.parseInt(lineArray[rowIndex]);
                 }
             }
             br.close();
@@ -85,7 +78,16 @@ public class Matrix {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return intMatrix;
     }
 
+    public String toString() {
+        String s = "";
+        for(int columnIndex=0; columnIndex < columnLength; columnIndex++) {
+            for(int rowIndex=0; rowIndex < rowLength; rowIndex++) {
+                s += matrix[rowIndex][columnIndex] + " ";
+            }
+            s += "\n";
+        }
+        return s;
+    }
 }
