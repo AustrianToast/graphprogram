@@ -1,5 +1,4 @@
 import java.util.Arrays;
-import java.util.ArrayList;
 
 public class Graph {
     private Matrix adjazenzMatrix;
@@ -8,7 +7,7 @@ public class Graph {
     private int[] exzentrizitäten;
     private int radius;
     private int durchmesser;
-    private ArrayList<Integer> zentrum;
+    private int[] zentrum;
 
     public static void main(String[] args) {}
 
@@ -91,29 +90,37 @@ public class Graph {
     }
 
     public void calculateProperties() {
-        Arrays.sort(exzentrizitäten);
-        radius = exzentrizitäten[0];
-        durchmesser = exzentrizitäten[exzentrizitäten.length - 1];
-        zentrum = new ArrayList<>();
+        radius = Integer.MAX_VALUE;
+        durchmesser = 0;
+        int sum = 1;
 
-        for(int eRowIndex=exzentrizitäten.length - 1, index = 0; eRowIndex > 0 && index < exzentrizitäten.length; eRowIndex--, index++) {
-            if(exzentrizitäten[eRowIndex] == durchmesser) {
-                zentrum.add(index, durchmesser);
+        for(int rowIndex = 0; rowIndex < exzentrizitäten.length; rowIndex++) {
+            if(exzentrizitäten[rowIndex] < radius) {
+                radius = exzentrizitäten[rowIndex];
+            }
+            if(exzentrizitäten[rowIndex] == durchmesser) {
+                sum++;
+            }
+            if(exzentrizitäten[rowIndex] > durchmesser) {
+                durchmesser = exzentrizitäten[rowIndex];
+                sum = 1;
+            } 
+        }
+        zentrum = new int[sum];
+
+        for(int rowIndex = 0, index = 0; rowIndex < exzentrizitäten.length; rowIndex++) {
+            if(exzentrizitäten[rowIndex] == durchmesser) {
+                zentrum[index] = rowIndex + 1;
+                index++;
             }
         }
-        zentrum.toArray();
     }
 
     public String toString() {
         String s = "";
 
-        s += "Adjazenzmatrix: \n" + adjazenzMatrix + "\nDistanzmatrix: \n" + distanzMatrix + "\nWegmatrix: \n" + wegMatrix + "\nExzentrizitäten: \n";
-
-        for(int rowIndex=0; rowIndex < exzentrizitäten.length; rowIndex++) {
-            s += exzentrizitäten[rowIndex] + " ";
-        }
-        
-        s += "\nRadius: " + radius + "\nDurchmesser: " + durchmesser + "\nZentrum: " + zentrum;
+        s += "Adjazenzmatrix:\n" + adjazenzMatrix + "\nDistanzmatrix:\n" + distanzMatrix + "\nWegmatrix:\n" + wegMatrix;
+        s += "\nExzentrizitäten: " + Arrays.toString(exzentrizitäten) + "\nRadius: " + radius + "\nDurchmesser: " + durchmesser + "\nZentrum: " + Arrays.toString(zentrum);
 
         return s;
     }
