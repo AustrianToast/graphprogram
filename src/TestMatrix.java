@@ -3,12 +3,12 @@ public class TestMatrix {
         Matrix matrix = new Matrix("/home/old/projects/Java/graphprogram/24n_01.csv");
         Matrix scalarProduct;
 
-        System.out.println(matrix.getRowLength());
-        System.out.println(matrix.getColumnLength());
+        System.out.println("RowLength: " + matrix.getRowLength());
+        System.out.println("ColumnLength: " +matrix.getColumnLength());
 
-        System.out.println(matrix);
+        System.out.println("\nMatrix A:  \n" + matrix);
         
         scalarProduct = matrix.multiply(matrix);
-        System.out.println(scalarProduct);
+        System.out.println("\nScalarProduct A²:  \n" + scalarProduct);
     }
 }

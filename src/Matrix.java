@@ -23,7 +23,7 @@ public class Matrix {
     public Matrix(int[][] matrix) {
         this.matrix = matrix;
         rowLength = matrix.length;
-        columnLength = rowLength;
+        columnLength = matrix[0].length;
     }
 
     public Matrix multiply(Matrix m) {
@@ -66,13 +66,12 @@ public class Matrix {
             
             matrix = new int[rowLength][columnLength];
 
-            for(int columnIndex = 0; line != null && columnIndex < matrix.length; columnIndex++, line = br.readLine()) {
+            for(int columnIndex = 0; line != null; columnIndex++, line = br.readLine()) {
                 lineArray = line.split(";");
                 for(int rowIndex=0; rowIndex < matrix[columnIndex].length; rowIndex++) {
                     matrix[rowIndex][columnIndex] = Integer.parseInt(lineArray[rowIndex]);
                 }
             }
-            br.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
         } catch (IOException e) {
