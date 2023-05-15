@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Graph {
@@ -24,8 +25,8 @@ public class Graph {
         calculateExzentrizitäten();
         calculateProperties();
         findComponents();
-        findBridges();
-        findArticulations();
+        //findBridges();
+        //findArticulations();
     }
 
     public void calculateDistanzMatrix() {
@@ -131,7 +132,7 @@ public class Graph {
     }
 
     public void findComponents() {
-        components = new int[wegMatrix.getRowLength()][wegMatrix.getColumnLength()];
+        ArrayList<int[]> tempComponents = new ArrayList<>(1);
         int[] component = new int[wegMatrix.getRowLength()];
 
         for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
@@ -141,81 +142,77 @@ public class Graph {
                     index++;
                 }
             }
-            components[rowIndex] = component;
-        }
-        
-        for(int rowIndex = 0; rowIndex < components.length; rowIndex++) {
-            for(int index = 1; index < components.length; index++) {
-                if(components[index] != null && components[rowIndex].equals(components[index])) {
-                    components[index] = null;
-                }
+            if(tempComponents.contains(component)) {
+                continue;
             }
+            tempComponents.add(component);
+        }
+
+        components = new int[tempComponents.size()][wegMatrix.getColumnLength()];
+
+        for(int rowIndex = 0; rowIndex < components.length; rowIndex++) {
+            components[rowIndex] = tempComponents.get(rowIndex);
         }
     }
 
     public int[][] findComponents(Matrix matrix) {
-        int[][] tempComponents = new int[matrix.getRowLength()][matrix.getColumnLength()];
-        int[] component = new int[matrix.getRowLength()];
+        int[][] newComponents;
+        ArrayList<int[]> tempComponents = new ArrayList<>(1);
+        int[] component = new int[wegMatrix.getRowLength()];
 
-        for(int rowIndex = 0; rowIndex < matrix.getRowLength(); rowIndex++) {
-            for(int columnIndex = 0, index = 0; columnIndex < matrix.getColumnLength(); columnIndex++) {
-                if(matrix.getValueAt(rowIndex, columnIndex) == 1) {
+        for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
+            for(int columnIndex = 0, index = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
+                if(wegMatrix.getValueAt(rowIndex, columnIndex) == 1) {
                     component[index] = columnIndex + 1;
                     index++;
                 }
             }
-            tempComponents[rowIndex] = component;
-        }
-        if(!zusammenhaengend) {
-            return null;
-        }
-        
-        for(int rowIndex = 0; rowIndex < tempComponents.length; rowIndex++) {
-            for(int index = 1; index < tempComponents.length; index++) {
-                if(tempComponents[index] != null && tempComponents[rowIndex].equals(tempComponents[index])) {
-                    tempComponents[index] = null;
-                }
+            if(tempComponents.contains(component)) {
+                continue;
             }
+            tempComponents.add(component);
         }
-        return tempComponents;
+
+        newComponents = new int[tempComponents.size()][wegMatrix.getColumnLength()];
+
+        for(int rowIndex = 0; rowIndex < newComponents.length; rowIndex++) {
+            newComponents[rowIndex] = tempComponents.get(rowIndex);
+        }
+        return  newComponents;
     }
 
     public void findBridges() {
         if(!zusammenhaengend) {
             return;
         }
-        bridges = new int[wegMatrix.getRowLength()][2];
+        ArrayList<int[]> tempBridges = new ArrayList<>(10);
         int[][] newComponents;
-        int[] bridge = new int[2];
+        int[] bridge;
 
-        for(int i = 0, columnIndex = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
+        for(int columnIndex = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
             for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
-                if(rowIndex != 1) {
-                    continue;
-                }
                 wegMatrix.insert(rowIndex, columnIndex, 0);
                 wegMatrix.insert(columnIndex, rowIndex, 0);
+                bridge = new int[2];
                 bridge[0] = columnIndex + 1;
                 bridge[1] = rowIndex + 1;
 
                 newComponents = findComponents(wegMatrix);
 
-                if(!components.equals(newComponents)) {
-                    bridges[i] = bridge;
-                    i++;
+                System.out.println(Arrays.toString(bridge));
+                if(!components.equals(newComponents) && !tempBridges.contains(bridge)) {
+                    System.out.println("bruh");
+                    tempBridges.add(bridge);
                 }
-
+                bridge = null;
                 wegMatrix.insert(rowIndex, columnIndex, 1);
                 wegMatrix.insert(columnIndex, rowIndex, 1);
             }
         }
-
+        bridges = new int[tempBridges.size()][2];
+        
         for(int rowIndex = 0; rowIndex < bridges.length; rowIndex++) {
-            for(int index = 1; index < bridges.length; index++) {
-                if(bridges[index] != null && bridges[rowIndex].equals(bridges[index])) {
-                    bridges[index] = null;
-                }
-            }
+            bridges[rowIndex] = tempBridges.get(rowIndex);
         }
     }
 
@@ -223,10 +220,10 @@ public class Graph {
         if(!zusammenhaengend) {
             return;
         }
-        articulations = new int[wegMatrix.getRowLength()];
+        ArrayList<Integer> tempArticulations = new ArrayList<>(10);
         int[][] newComponents;
 
-        for(int i = 0, j = 0; i < wegMatrix.getRowLength(); i++) {
+        for(int i = 0; i < wegMatrix.getRowLength(); i++) {
             for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
                 for(int columnIndex = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
                     wegMatrix.insert(rowIndex, i, 0);
@@ -241,8 +238,7 @@ public class Graph {
             newComponents = findComponents(wegMatrix);
     
             if(!components.equals(newComponents)) {
-                articulations[j] = i + 1;
-                j++;
+                tempArticulations.add(i + 1);
             }
 
             for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
@@ -251,6 +247,11 @@ public class Graph {
                     wegMatrix.insert(i, columnIndex, 1);
                 }
             }
+        }
+        articulations = new int[tempArticulations.size()];
+        
+        for(int rowIndex = 0; rowIndex < articulations.length; rowIndex++) {
+            articulations[rowIndex] = tempArticulations.get(rowIndex);
         }
     }
 
@@ -300,12 +301,7 @@ public class Graph {
         }
         s += "}";
 
-        s += "\nArtikulationen: {";
-        if(articulations[0] != 0) {
-            s += Arrays.toString(articulations);
-        }
-        s += "}";
-
+        s += "\nArtikulationen: " + Arrays.toString(articulations);
         return s;
     }
 }
