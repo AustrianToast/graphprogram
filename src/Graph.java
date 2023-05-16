@@ -9,7 +9,7 @@ public class Graph {
     private int[] exzentrizitäten;
     private int radius;
     private int durchmesser;
-    private int[] zentrum;
+    private ArrayList<Integer> centre;
     private int[][] components;
     private int[][] bridges;
     private int[] articulations;
@@ -18,7 +18,6 @@ public class Graph {
     public static void main(String[] args) {}
 
     public Graph(String file) {
-        zusammenhaengend = true;
         adjazenzMatrix = new Matrix(file);
         calculateDistanzMatrix();
         calculateWegMatrix();
@@ -102,33 +101,31 @@ public class Graph {
     public void calculateProperties() {
         radius = Integer.MAX_VALUE;
         durchmesser = -1;
-        int sum = 0;
+        zusammenhaengend = true;
+        centre = new ArrayList<>(1);
 
         for(int rowIndex = 0; rowIndex < exzentrizitäten.length; rowIndex++) {
+            if(exzentrizitäten[rowIndex] > durchmesser) {
+                centre.clear();
+                centre.add(rowIndex + 1);
+            }
             if(exzentrizitäten[rowIndex] < radius) {
                 radius = exzentrizitäten[rowIndex];
             }
             if(exzentrizitäten[rowIndex] == durchmesser) {
-                sum++;
+                centre.add(rowIndex + 1);
             }
             if(exzentrizitäten[rowIndex] > durchmesser) {
                 durchmesser = exzentrizitäten[rowIndex];
-                sum = 1;
             } 
         }
+
         if(durchmesser == 0 && exzentrizitäten.length > 1) {
             zusammenhaengend = false;
             return;
         }
 
-        zentrum = new int[sum];
-        
-        for(int rowIndex = 0, index = 0; rowIndex < exzentrizitäten.length; rowIndex++) {
-            if(exzentrizitäten[rowIndex] == durchmesser) {
-                zentrum[index] = rowIndex + 1;
-                index++;
-            }
-        }
+        centre.trimToSize();
     }
 
     public void findComponents() {
@@ -167,22 +164,31 @@ public class Graph {
     public int[][] findComponents(Matrix matrix) {
         int[][] newComponents;
         ArrayList<int[]> tempComponents = new ArrayList<>(1);
-        int[] component = new int[wegMatrix.getRowLength()];
+        ArrayList<Integer> tempComponent = new ArrayList<>(1);
+        int[] component;
 
-        for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
-            for(int columnIndex = 0, index = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
-                if(wegMatrix.getValueAt(rowIndex, columnIndex) == 1) {
-                    component[index] = columnIndex + 1;
-                    index++;
+        for(int rowIndex = 0; rowIndex < matrix.getRowLength(); rowIndex++) {
+            for(int columnIndex = 0; columnIndex < matrix.getColumnLength(); columnIndex++) {
+                if(matrix.getValueAt(rowIndex, columnIndex) == 1) {
+                    tempComponent.add(columnIndex + 1);
                 }
             }
+            component = new int[tempComponent.size()];
+
+            for(int index = 0; index < component.length; index++) {
+                component[index] = tempComponent.get(index);
+            }
+
             if(tempComponents.contains(component)) {
                 continue;
             }
-            tempComponents.add(component);
-        }
 
-        newComponents = new int[tempComponents.size()][wegMatrix.getColumnLength()];
+            tempComponents.add(component);
+
+            component = null;
+            tempComponent.clear();
+        }
+        newComponents = new int[tempComponents.size()][matrix.getColumnLength()];
 
         for(int rowIndex = 0; rowIndex < newComponents.length; rowIndex++) {
             newComponents[rowIndex] = tempComponents.get(rowIndex);
@@ -277,7 +283,7 @@ public class Graph {
 
         s += "\nZentrum: ";
         if(zusammenhaengend) {
-            s += Arrays.toString(zentrum);
+            s += centre;
         } else {
             s += "Kein zusammenhängender Graph";
         }
