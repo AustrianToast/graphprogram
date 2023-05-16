@@ -133,21 +133,30 @@ public class Graph {
 
     public void findComponents() {
         ArrayList<int[]> tempComponents = new ArrayList<>(1);
-        int[] component = new int[wegMatrix.getRowLength()];
+        ArrayList<Integer> tempComponent = new ArrayList<>(1);
+        int[] component;
 
         for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
-            for(int columnIndex = 0, index = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
+            for(int columnIndex = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
                 if(wegMatrix.getValueAt(rowIndex, columnIndex) == 1) {
-                    component[index] = columnIndex + 1;
-                    index++;
+                    tempComponent.add(columnIndex + 1);
                 }
             }
+            component = new int[tempComponent.size()];
+
+            for(int index = 0; index < component.length; index++) {
+                component[index] = tempComponent.get(index);
+            }
+
             if(tempComponents.contains(component)) {
                 continue;
             }
-            tempComponents.add(component);
-        }
 
+            tempComponents.add(component);
+
+            component = null;
+            tempComponent.clear();
+        }
         components = new int[tempComponents.size()][wegMatrix.getColumnLength()];
 
         for(int rowIndex = 0; rowIndex < components.length; rowIndex++) {
