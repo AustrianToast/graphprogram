@@ -5,10 +5,10 @@ public class Graph {
     private Matrix adjazenzMatrix;
     private Matrix distanzMatrix;
     private Matrix wegMatrix;
-    private boolean zusammenhaengend;
+    private boolean connected;
     private ArrayList<Integer> exzentrizitäten;
     private int radius;
-    private int durchmesser;
+    private int diameter;
     private ArrayList<Integer> centre;
     private ArrayList<ArrayList<Integer>> components;
     private ArrayList<int[]> bridges;
@@ -24,7 +24,7 @@ public class Graph {
         calculateExzentrizitäten();
         calculateProperties();
         findComponents();
-        //findBridges();
+        findBridges();
         findArticulations(file);
     }
 
@@ -101,26 +101,26 @@ public class Graph {
 
     public void calculateProperties() {
         radius = Integer.MAX_VALUE;
-        durchmesser = -1;
-        zusammenhaengend = true;
+        diameter = -1;
+        connected = true;
         centre = new ArrayList<>(1);
 
         for(int rowIndex = 0; rowIndex < exzentrizitäten.size(); rowIndex++) {
-            if(exzentrizitäten.get(rowIndex) > durchmesser) {
-                durchmesser = exzentrizitäten.get(rowIndex);
+            if(exzentrizitäten.get(rowIndex) > diameter) {
+                diameter = exzentrizitäten.get(rowIndex);
                 centre.clear();
                 centre.add(rowIndex + 1);
             }
             if(exzentrizitäten.get(rowIndex) < radius) {
                 radius = exzentrizitäten.get(rowIndex);
             }
-            if(exzentrizitäten.get(rowIndex) == durchmesser) {
+            if(exzentrizitäten.get(rowIndex) == diameter) {
                 centre.add(rowIndex + 1);
             }
         }
 
         if(radius == 0) {
-            zusammenhaengend = false;
+            connected = false;
         }
     }
 
@@ -168,27 +168,28 @@ public class Graph {
         ArrayList<ArrayList<Integer>> newComponents;
         int[] bridge;
 
-        for(int columnIndex = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
-            for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
+        for(int rowIndex = 0; rowIndex < adjazenzMatrix.getRowLength(); rowIndex++) {
+            for(int columnIndex = 0; columnIndex < adjazenzMatrix.getColumnLength(); columnIndex++) {
                 bridge = new int[2];
                 bridge[0] = columnIndex + 1;
                 bridge[1] = rowIndex + 1;
 
-                wegMatrix.insert(rowIndex, columnIndex, 0);
-                wegMatrix.insert(columnIndex, rowIndex, 0);
+                adjazenzMatrix.insert(rowIndex, columnIndex, 0);
+                adjazenzMatrix.insert(columnIndex, rowIndex, 0);
+
+                calculateWegMatrix();
 
                 newComponents = findComponents(wegMatrix);
 
-                //System.out.println(Arrays.toString(bridge));
                 if(newComponents.size() > components.size()) {
-                    //System.out.println("bruh");
                     bridges.add(bridge);
                 }
 
-                wegMatrix.insert(rowIndex, columnIndex, 1);
-                wegMatrix.insert(columnIndex, rowIndex, 1);
+                adjazenzMatrix.insert(rowIndex, columnIndex, 1);
+                adjazenzMatrix.insert(columnIndex, rowIndex, 1);
             }
         }
+        calculateWegMatrix();
     }
 
     public void findArticulations(String file) {
@@ -213,6 +214,7 @@ public class Graph {
 
             adjazenzMatrix = new Matrix(file);
         }
+        calculateWegMatrix();
     }
 
     public String toString() {
@@ -220,14 +222,14 @@ public class Graph {
 
         s += "Adjazenzmatrix:\n" + adjazenzMatrix + "\nDistanzmatrix:\n" + distanzMatrix + "\nWegmatrix:\n" + wegMatrix;
         
-        if(!zusammenhaengend) {
+        if(!connected) {
             s += "\nExzentrizitäten/Radius/Durchmesser: Kein zusammenhängender Graph";
         } else {
-            s += "\nExzentrizitäten: " + exzentrizitäten.toString() + "\nRadius: " + radius + "\nDurchmesser: " + durchmesser;
+            s += "\nExzentrizitäten: " + exzentrizitäten.toString() + "\nRadius: " + radius + "\nDurchmesser: " + diameter;
         }
 
         s += "\nZentrum: ";
-        if(!zusammenhaengend) {
+        if(!connected) {
             s += "Kein zusammenhängender Graph";
         } else {
             s += centre;
