@@ -6,13 +6,13 @@ public class Graph {
     private Matrix distanzMatrix;
     private Matrix wegMatrix;
     private boolean zusammenhaengend;
-    private int[] exzentrizitäten;
+    private ArrayList<Integer> exzentrizitäten;
     private int radius;
     private int durchmesser;
     private ArrayList<Integer> centre;
-    private int[][] components;
-    private int[][] bridges;
-    private int[] articulations;
+    private ArrayList<ArrayList<Integer>> components;
+    private ArrayList<int[]> bridges;
+    private ArrayList<Integer> articulations;
 
 
     public static void main(String[] args) {}
@@ -25,7 +25,7 @@ public class Graph {
         calculateProperties();
         findComponents();
         //findBridges();
-        //findArticulations();
+        findArticulations(file);
     }
 
     public void calculateDistanzMatrix() {
@@ -85,7 +85,8 @@ public class Graph {
     }
 
     public void calculateExzentrizitäten() {
-        exzentrizitäten = new int[distanzMatrix.getRowLength()];
+        exzentrizitäten = new ArrayList<>(1);
+
         for(int rowIndex = 0; rowIndex < distanzMatrix.getRowLength(); rowIndex++) {
             int exzentrizität = 0;
 
@@ -94,7 +95,7 @@ public class Graph {
                     exzentrizität = distanzMatrix.getValueAt(columnIndex, rowIndex);
                 }
             }
-            exzentrizitäten[rowIndex] = exzentrizität;
+            exzentrizitäten.add(exzentrizität);
         }
     }
 
@@ -104,169 +105,113 @@ public class Graph {
         zusammenhaengend = true;
         centre = new ArrayList<>(1);
 
-        for(int rowIndex = 0; rowIndex < exzentrizitäten.length; rowIndex++) {
-            if(exzentrizitäten[rowIndex] > durchmesser) {
+        for(int rowIndex = 0; rowIndex < exzentrizitäten.size(); rowIndex++) {
+            if(exzentrizitäten.get(rowIndex) > durchmesser) {
+                durchmesser = exzentrizitäten.get(rowIndex);
                 centre.clear();
                 centre.add(rowIndex + 1);
             }
-            if(exzentrizitäten[rowIndex] < radius) {
-                radius = exzentrizitäten[rowIndex];
+            if(exzentrizitäten.get(rowIndex) < radius) {
+                radius = exzentrizitäten.get(rowIndex);
             }
-            if(exzentrizitäten[rowIndex] == durchmesser) {
+            if(exzentrizitäten.get(rowIndex) == durchmesser) {
                 centre.add(rowIndex + 1);
             }
-            if(exzentrizitäten[rowIndex] > durchmesser) {
-                durchmesser = exzentrizitäten[rowIndex];
-            } 
         }
 
-        if(durchmesser == 0 && exzentrizitäten.length > 1) {
+        if(radius == 0) {
             zusammenhaengend = false;
-            return;
         }
-
-        centre.trimToSize();
     }
 
     public void findComponents() {
-        ArrayList<int[]> tempComponents = new ArrayList<>(1);
-        ArrayList<Integer> tempComponent = new ArrayList<>(1);
-        int[] component;
+        components = new ArrayList<>(1);
+        ArrayList<Integer> component = new ArrayList<>(1);
 
         for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
+            component = new ArrayList<>(1);
+
             for(int columnIndex = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
                 if(wegMatrix.getValueAt(rowIndex, columnIndex) == 1) {
-                    tempComponent.add(columnIndex + 1);
+                    component.add(columnIndex + 1);
                 }
             }
-            component = new int[tempComponent.size()];
-
-            for(int index = 0; index < component.length; index++) {
-                component[index] = tempComponent.get(index);
+            
+            if(!components.contains(component)) {
+                components.add(component);
             }
-
-            if(tempComponents.contains(component)) {
-                continue;
-            }
-
-            tempComponents.add(component);
-
-            component = null;
-            tempComponent.clear();
-        }
-        components = new int[tempComponents.size()][wegMatrix.getColumnLength()];
-
-        for(int rowIndex = 0; rowIndex < components.length; rowIndex++) {
-            components[rowIndex] = tempComponents.get(rowIndex);
         }
     }
 
-    public int[][] findComponents(Matrix matrix) {
-        int[][] newComponents;
-        ArrayList<int[]> tempComponents = new ArrayList<>(1);
-        ArrayList<Integer> tempComponent = new ArrayList<>(1);
-        int[] component;
+    public ArrayList<ArrayList<Integer>> findComponents(Matrix matrix) {
+        ArrayList<ArrayList<Integer>> newComponents = new ArrayList<>(1);
+        ArrayList<Integer> component = new ArrayList<>(1);
 
         for(int rowIndex = 0; rowIndex < matrix.getRowLength(); rowIndex++) {
-            for(int columnIndex = 0; columnIndex < matrix.getColumnLength(); columnIndex++) {
-                if(matrix.getValueAt(rowIndex, columnIndex) == 1) {
-                    tempComponent.add(columnIndex + 1);
+            component = new ArrayList<>(1);
+
+            for(int columnIndex = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
+                if(wegMatrix.getValueAt(rowIndex, columnIndex) == 1) {
+                    component.add(columnIndex + 1);
                 }
             }
-            component = new int[tempComponent.size()];
-
-            for(int index = 0; index < component.length; index++) {
-                component[index] = tempComponent.get(index);
+            
+            if(!newComponents.contains(component)) {
+                newComponents.add(component);
             }
-
-            if(tempComponents.contains(component)) {
-                continue;
-            }
-
-            tempComponents.add(component);
-
-            component = null;
-            tempComponent.clear();
-        }
-        newComponents = new int[tempComponents.size()][matrix.getColumnLength()];
-
-        for(int rowIndex = 0; rowIndex < newComponents.length; rowIndex++) {
-            newComponents[rowIndex] = tempComponents.get(rowIndex);
         }
         return  newComponents;
     }
 
     public void findBridges() {
-        if(!zusammenhaengend) {
-            return;
-        }
-        ArrayList<int[]> tempBridges = new ArrayList<>(10);
-        int[][] newComponents;
+        bridges = new ArrayList<>(1);
+        ArrayList<ArrayList<Integer>> newComponents;
         int[] bridge;
 
         for(int columnIndex = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
             for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
-                wegMatrix.insert(rowIndex, columnIndex, 0);
-                wegMatrix.insert(columnIndex, rowIndex, 0);
                 bridge = new int[2];
                 bridge[0] = columnIndex + 1;
                 bridge[1] = rowIndex + 1;
 
+                wegMatrix.insert(rowIndex, columnIndex, 0);
+                wegMatrix.insert(columnIndex, rowIndex, 0);
+
                 newComponents = findComponents(wegMatrix);
 
-                System.out.println(Arrays.toString(bridge));
-                if(!components.equals(newComponents) && !tempBridges.contains(bridge)) {
-                    System.out.println("bruh");
-                    tempBridges.add(bridge);
+                //System.out.println(Arrays.toString(bridge));
+                if(newComponents.size() > components.size()) {
+                    //System.out.println("bruh");
+                    bridges.add(bridge);
                 }
-                bridge = null;
+
                 wegMatrix.insert(rowIndex, columnIndex, 1);
                 wegMatrix.insert(columnIndex, rowIndex, 1);
             }
         }
-        bridges = new int[tempBridges.size()][2];
-        
-        for(int rowIndex = 0; rowIndex < bridges.length; rowIndex++) {
-            bridges[rowIndex] = tempBridges.get(rowIndex);
-        }
     }
 
-    public void findArticulations() {
-        if(!zusammenhaengend) {
-            return;
-        }
-        ArrayList<Integer> tempArticulations = new ArrayList<>(10);
-        int[][] newComponents;
+    public void findArticulations(String file) {
+        articulations = new ArrayList<>(1);
+        ArrayList<ArrayList<Integer>> newComponents;
 
-        for(int i = 0; i < wegMatrix.getRowLength(); i++) {
-            for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
-                for(int columnIndex = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
-                    wegMatrix.insert(rowIndex, i, 0);
-                    wegMatrix.insert(i, columnIndex, 0);
+        for(int i = 0; i < adjazenzMatrix.getRowLength(); i++) {
+            for(int rowIndex = 0; rowIndex < adjazenzMatrix.getRowLength(); rowIndex++) {
+                for(int columnIndex = 0; columnIndex < adjazenzMatrix.getColumnLength(); columnIndex++) {
+                    adjazenzMatrix.insert(rowIndex, i, 0);
+                    adjazenzMatrix.insert(i, columnIndex, 0);
                 }
             }
 
-            /*
-             * need to figure out what removing a node means
-             */
-    
+            calculateWegMatrix();
+
             newComponents = findComponents(wegMatrix);
     
-            if(!components.equals(newComponents)) {
-                tempArticulations.add(i + 1);
+            if(newComponents.size() > components.size() + 1) {
+                articulations.add(i + 1);
             }
 
-            for(int rowIndex = 0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
-                for(int columnIndex = 0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
-                    wegMatrix.insert(rowIndex, i, 1);
-                    wegMatrix.insert(i, columnIndex, 1);
-                }
-            }
-        }
-        articulations = new int[tempArticulations.size()];
-        
-        for(int rowIndex = 0; rowIndex < articulations.length; rowIndex++) {
-            articulations[rowIndex] = tempArticulations.get(rowIndex);
+            adjazenzMatrix = new Matrix(file);
         }
     }
 
@@ -278,45 +223,39 @@ public class Graph {
         if(!zusammenhaengend) {
             s += "\nExzentrizitäten/Radius/Durchmesser: Kein zusammenhängender Graph";
         } else {
-            s += "\nExzentrizitäten: " + Arrays.toString(exzentrizitäten) + "\nRadius: " + radius + "\nDurchmesser: " + durchmesser;
+            s += "\nExzentrizitäten: " + exzentrizitäten.toString() + "\nRadius: " + radius + "\nDurchmesser: " + durchmesser;
         }
 
         s += "\nZentrum: ";
-        if(zusammenhaengend) {
-            s += centre;
-        } else {
+        if(!zusammenhaengend) {
             s += "Kein zusammenhängender Graph";
+        } else {
+            s += centre;
         }
         
         s += "\nKomponente: {";
-        for(int rowIndex = 0; rowIndex < components.length; rowIndex++) {
-            if(components[rowIndex] != null) {
-                s += Arrays.toString(components[rowIndex]);
-                if(rowIndex < components.length - 1) {
-                    if(components[rowIndex + 1] != null) {
-                        s += ",";
-                    }
-                }
+        for(int rowIndex = 0; rowIndex < components.size(); rowIndex++) {
+            s += components.get(rowIndex).toString();
+            if(rowIndex < components.size() - 1) {
+                s += ",";
             }
         }
         s += "}";
 
         s += "\nBrücken: {";
         if(bridges != null) {
-            for(int rowIndex = 0; rowIndex < bridges.length; rowIndex++) {
-                if(bridges[rowIndex] != null) {
-                    s += Arrays.toString(bridges[rowIndex]);
-                    if(rowIndex < bridges.length - 1) {
-                        if(bridges[rowIndex + 1] != null) {
-                            s += ",";
-                        }
+            for(int rowIndex = 0; rowIndex < bridges.size(); rowIndex++) {
+                s += Arrays.toString(bridges.get(rowIndex));
+                if(rowIndex < bridges.size() - 1) {
+                    if(rowIndex < bridges.size() - 1) {
+                        s += ",";
                     }
                 }
             }
-        }
+        }   
         s += "}";
 
-        s += "\nArtikulationen: " + Arrays.toString(articulations);
+        s += "\nArtikulationen: " + articulations.toString();
         return s;
     }
 }
