@@ -24,7 +24,7 @@ public class Graph {
         calculateExzentrizitäten();
         calculateProperties();
         findComponents();
-        findBridges();
+        findBridges(file);
         findArticulations(file);
     }
 
@@ -163,16 +163,27 @@ public class Graph {
         return  newComponents;
     }
 
-    public void findBridges() {
+    public void findBridges(String file) {
         bridges = new ArrayList<>(1);
         ArrayList<ArrayList<Integer>> newComponents;
         int[] bridge;
+        boolean contains;
 
         for(int rowIndex = 0; rowIndex < adjazenzMatrix.getRowLength(); rowIndex++) {
             for(int columnIndex = 0; columnIndex < adjazenzMatrix.getColumnLength(); columnIndex++) {
+                if(rowIndex == columnIndex) {
+                    continue;
+                }
+                
                 bridge = new int[2];
-                bridge[0] = columnIndex + 1;
-                bridge[1] = rowIndex + 1;
+                if(columnIndex < rowIndex) {
+                    bridge[0] = columnIndex + 1;
+                    bridge[1] = rowIndex + 1;
+                } else {
+                    bridge[1] = columnIndex + 1;
+                    bridge[0] = rowIndex + 1;
+                }
+                
 
                 adjazenzMatrix.insert(rowIndex, columnIndex, 0);
                 adjazenzMatrix.insert(columnIndex, rowIndex, 0);
@@ -181,12 +192,19 @@ public class Graph {
 
                 newComponents = findComponents(wegMatrix);
 
-                if(newComponents.size() > components.size()) {
+                contains = false;
+                for (int[] array : bridges) {
+                    if(Arrays.equals(array, bridge)) {
+                        contains = true;
+                        break;
+                    }
+                }
+
+                if(newComponents.size() > components.size() && !contains) {
                     bridges.add(bridge);
                 }
 
-                adjazenzMatrix.insert(rowIndex, columnIndex, 1);
-                adjazenzMatrix.insert(columnIndex, rowIndex, 1);
+                adjazenzMatrix = new Matrix(file);
             }
         }
         calculateWegMatrix();
