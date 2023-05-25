@@ -15,11 +15,13 @@ public class Matrix {
         readCSV(file);
     }
 
-    public Matrix(int rowLength, int columnLength) {
+    public Matrix(int rowLength, int columnLength, boolean random) {
         matrix = new int[rowLength][columnLength];
         this.rowLength = rowLength;
         this.columnLength = columnLength;
-        randomAdjazenzMatrix();
+        if(random) {
+            randomAdjazenzMatrix();
+        }
     }
 
     public Matrix(int[][] matrix) {
