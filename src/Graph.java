@@ -95,11 +95,19 @@ public class Graph {
                     exzentrizität = distanzMatrix.getValueAt(columnIndex, rowIndex);
                 }
             }
+            if(exzentrizität == 0) {
+                connected = false;
+                return;
+            }
             exzentrizitäten.add(exzentrizität);
         }
     }
 
     public void calculateProperties() {
+        if(!connected) {
+            return;
+        }
+        
         radius = Integer.MAX_VALUE;
         diameter = -1;
         connected = true;
@@ -108,19 +116,15 @@ public class Graph {
         for(int rowIndex = 0; rowIndex < exzentrizitäten.size(); rowIndex++) {
             if(exzentrizitäten.get(rowIndex) > diameter) {
                 diameter = exzentrizitäten.get(rowIndex);
-                centre.clear();
+            }
+            if(exzentrizitäten.get(rowIndex) == radius) {
                 centre.add(rowIndex + 1);
             }
             if(exzentrizitäten.get(rowIndex) < radius) {
                 radius = exzentrizitäten.get(rowIndex);
-            }
-            if(exzentrizitäten.get(rowIndex) == diameter) {
+                centre.clear();
                 centre.add(rowIndex + 1);
             }
-        }
-
-        if(radius == 0) {
-            connected = false;
         }
     }
 
