@@ -1,6 +1,8 @@
 public class TestMatrix {
     public static void main(String[] args) {
-        Matrix matrix = new Matrix("");
+        String pathToProgramRoot = "";
+
+        Matrix matrix = new Matrix(pathToProgramRoot + "/csv/graph.csv");
         Matrix scalarProduct;
 
         System.out.println("RowLength: " + matrix.getRowLength());
