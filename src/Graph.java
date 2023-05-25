@@ -17,11 +17,6 @@ public class Graph {
 
     public static void main(String[] args) {}
 
-    public Graph(int rowLength, int columnLength) {
-
-
-    }
-
     public Graph(String file) {
         adjazenzMatrix = new Matrix(file);
         calculateDistanzMatrix();
@@ -34,7 +29,7 @@ public class Graph {
     }
 
     public void calculateDistanzMatrix() {
-        distanzMatrix = new Matrix(adjazenzMatrix.getRowLength(), adjazenzMatrix.getColumnLength(), false);
+        distanzMatrix = new Matrix(adjazenzMatrix.getRowLength(), adjazenzMatrix.getColumnLength());
         Matrix potenzMatrix = adjazenzMatrix;
 
         for(int columnIndex=0; columnIndex < distanzMatrix.getColumnLength(); columnIndex++) {
@@ -63,7 +58,7 @@ public class Graph {
     }
 
     public void calculateWegMatrix() {
-        wegMatrix = new Matrix(adjazenzMatrix.getRowLength(), adjazenzMatrix.getColumnLength(), false);
+        wegMatrix = new Matrix(adjazenzMatrix.getRowLength(), adjazenzMatrix.getColumnLength());
         Matrix potenzMatrix = adjazenzMatrix;
 
         for(int columnIndex=0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {

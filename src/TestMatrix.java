@@ -13,7 +13,7 @@ public class TestMatrix {
         scalarProduct = matrix.multiply(matrix);
         System.out.println("\nScalarProduct A²:  \n" + scalarProduct);
 
-        Matrix bruh = new Matrix(100, 100, true);
+        Matrix bruh = new Matrix(100, 100);
         System.out.println(bruh);
     }
 }

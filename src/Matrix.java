@@ -15,13 +15,10 @@ public class Matrix {
         readCSV(file);
     }
 
-    public Matrix(int rowLength, int columnLength, boolean random) {
+    public Matrix(int rowLength, int columnLength) {
         matrix = new int[rowLength][columnLength];
         this.rowLength = rowLength;
         this.columnLength = columnLength;
-        if(random) {
-            randomAdjazenzMatrix();
-        }
     }
 
     public Matrix(int[][] matrix) {
@@ -81,6 +78,18 @@ public class Matrix {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public int[][] clone() {
+        int[][] clone = new int[rowLength][columnLength];
+
+        for(int columnIndex=0; columnIndex < columnLength; columnIndex++) {
+            for(int rowIndex=0; rowIndex < rowLength; rowIndex++) {
+                clone[rowIndex][columnIndex] = matrix[rowIndex][columnIndex];
+            }
+        }
+
+        return clone;
     }
 
     public void randomAdjazenzMatrix() {
