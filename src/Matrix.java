@@ -11,6 +11,16 @@ public class Matrix {
 
     public static void main(String[] args) {}
 
+    public Matrix(int rowLength, int columnLength, boolean random) {
+        if(!random) {
+            return;
+        }
+        matrix = new int[rowLength][columnLength];
+        this.rowLength = rowLength;
+        this.columnLength = columnLength;
+        randomAdjazenzMatrix();
+    }
+
     public Matrix(String file) {
         readCSV(file);
     }

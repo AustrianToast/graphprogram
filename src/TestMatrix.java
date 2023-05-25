@@ -1,6 +1,11 @@
 public class TestMatrix {
     public static void main(String[] args) {
-        String pathToProgramRoot = "/home/rene/projects/Java/graphprogram";
+        test1();
+        test2();
+    }
+
+    public static void test1() {
+        String pathToProgramRoot = "";
 
         Matrix matrix = new Matrix(pathToProgramRoot + "/csv/graph.csv");
         Matrix scalarProduct;
@@ -12,8 +17,10 @@ public class TestMatrix {
         
         scalarProduct = matrix.multiply(matrix);
         System.out.println("\nScalarProduct A²:  \n" + scalarProduct);
-
-        Matrix bruh = new Matrix(100, 100);
-        System.out.println(bruh);
     }
+
+    public static void test2() {
+        Matrix bruh = new Matrix(10, 10, true);
+        System.out.println(bruh);
+    } 
 }
