@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Random;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 
@@ -18,6 +19,7 @@ public class Matrix {
         matrix = new int[rowLength][columnLength];
         this.rowLength = rowLength;
         this.columnLength = columnLength;
+        randomAdjazenzMatrix();
     }
 
     public Matrix(int[][] matrix) {
@@ -76,6 +78,18 @@ public class Matrix {
 			e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void randomAdjazenzMatrix() {
+        Random r = new Random();
+        for(int columnIndex=0; columnIndex < columnLength; columnIndex++) {
+            for(int rowIndex=0; rowIndex < rowLength; rowIndex++) {
+                if(rowIndex == columnIndex) {
+                    continue;
+                }
+                matrix[rowIndex][columnIndex] = r.nextInt(2);
+            }
         }
     }
 
