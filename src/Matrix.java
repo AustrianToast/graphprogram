@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.util.Random;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 public class Matrix {
     private int[][] matrix;
@@ -13,6 +15,9 @@ public class Matrix {
 
     public Matrix(int rowLength, int columnLength, boolean random) {
         if(!random) {
+            matrix = new int[rowLength][columnLength];
+            this.rowLength = rowLength;
+            this.columnLength = columnLength;
             return;
         }
         matrix = new int[rowLength][columnLength];
@@ -111,6 +116,25 @@ public class Matrix {
                 }
                 matrix[rowIndex][columnIndex] = r.nextInt(2);
             }
+        }
+    }
+
+    public void WriteToCsv(String filename) {
+        String s = "";
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
+            for(int columnIndex=0; columnIndex < columnLength; columnIndex++) {
+                s = "";
+                for(int rowIndex=0; rowIndex < rowLength; rowIndex++) {
+                    s += matrix[columnIndex][rowIndex];
+                    if(rowIndex < rowLength - 1) {
+                        s += ";";
+                    }
+                }
+                bw.write(s + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

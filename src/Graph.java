@@ -86,6 +86,7 @@ public class Graph {
 
     public void calculateExzentrizitäten() {
         exzentrizitäten = new ArrayList<>(1);
+        connected = true;
 
         for(int rowIndex = 0; rowIndex < distanzMatrix.getRowLength(); rowIndex++) {
             int exzentrizität = 0;
@@ -110,7 +111,6 @@ public class Graph {
         
         radius = Integer.MAX_VALUE;
         diameter = -1;
-        connected = true;
         centre = new ArrayList<>(1);
 
         for(int rowIndex = 0; rowIndex < exzentrizitäten.size(); rowIndex++) {

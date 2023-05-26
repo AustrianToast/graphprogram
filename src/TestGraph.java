@@ -1,12 +1,13 @@
 public class TestGraph {
     public static void main(String[] args) {
-        test1();
-        test2();
-        test3();
-        test4();
+        // test1();
+        // test2();
+        // test3();
+        // test4();
+        test5();
     }
 
-    static String pathToProgramRoot = "";
+    static String pathToProgramRoot = "/home/rene/projects/Java/graphprogram";
 
 
     /*
@@ -39,6 +40,14 @@ public class TestGraph {
      */
     public static void test4() {
         Graph g = new Graph(pathToProgramRoot + "/csv/art-brck.csv");
+        System.out.println(g);
+    }
+
+    /*
+     * randomly generated graph with x nodes
+     */
+    public static void test5() {
+        Graph g = new Graph(pathToProgramRoot + "/csv/50n.csv");
         System.out.println(g);
     }
 }
