@@ -20,12 +20,12 @@ public class Graph {
     public Graph(String file) {
         adjazenzMatrix = new Matrix(file);
         calculateDistanzMatrix();
-        calculateWegMatrix();
+        calculateWegMatrix(adjazenzMatrix);
         calculateExzentrizitäten();
         calculateProperties();
         findComponents();
-        findBridges(file);
-        findArticulations(file);
+        findBridges();
+        findArticulations();
     }
 
     public void calculateDistanzMatrix() {
@@ -57,22 +57,22 @@ public class Graph {
         }
     }
 
-    public void calculateWegMatrix() {
-        wegMatrix = new Matrix(adjazenzMatrix.getRowLength(), adjazenzMatrix.getColumnLength());
-        Matrix potenzMatrix = adjazenzMatrix;
+    public void calculateWegMatrix(Matrix matrix) {
+        wegMatrix = new Matrix(matrix.getRowLength(), matrix.getColumnLength());
+        Matrix potenzMatrix = matrix;
 
         for(int columnIndex=0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
             for(int rowIndex=0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
                 if(columnIndex == rowIndex) {
                     wegMatrix.insert(rowIndex, columnIndex, 1);
-                } else if(adjazenzMatrix.getValueAt(rowIndex, columnIndex) > 0 && wegMatrix.getValueAt(rowIndex, columnIndex) == 0) {
+                } else if(matrix.getValueAt(rowIndex, columnIndex) > 0 && wegMatrix.getValueAt(rowIndex, columnIndex) == 0) {
                     wegMatrix.insert(rowIndex, columnIndex, 1);
                 }
             }
         }
 
         for(int k = 2; k < wegMatrix.getRowLength(); k++) {
-            potenzMatrix = potenzMatrix.multiply(adjazenzMatrix);
+            potenzMatrix = potenzMatrix.multiply(matrix);
 
             for(int columnIndex=0; columnIndex < wegMatrix.getColumnLength(); columnIndex++) {
                 for(int rowIndex=0; rowIndex < wegMatrix.getRowLength(); rowIndex++) {
@@ -164,17 +164,18 @@ public class Graph {
                 newComponents.add(component);
             }
         }
-        return  newComponents;
+        return newComponents;
     }
 
-    public void findBridges(String file) {
+    public void findBridges() {
+        Matrix tempMatrix = adjazenzMatrix.clone();
         bridges = new ArrayList<>(1);
         ArrayList<ArrayList<Integer>> newComponents;
         int[] bridge;
         boolean contains;
 
-        for(int rowIndex = 0; rowIndex < adjazenzMatrix.getRowLength(); rowIndex++) {
-            for(int columnIndex = 0; columnIndex < adjazenzMatrix.getColumnLength(); columnIndex++) {
+        for(int rowIndex = 0; rowIndex < tempMatrix.getRowLength(); rowIndex++) {
+            for(int columnIndex = 0; columnIndex < tempMatrix.getColumnLength(); columnIndex++) {
                 if(rowIndex == columnIndex) {
                     continue;
                 }
@@ -187,12 +188,11 @@ public class Graph {
                     bridge[1] = columnIndex + 1;
                     bridge[0] = rowIndex + 1;
                 }
-                
 
-                adjazenzMatrix.insert(rowIndex, columnIndex, 0);
-                adjazenzMatrix.insert(columnIndex, rowIndex, 0);
+                tempMatrix.insert(rowIndex, columnIndex, 0);
+                tempMatrix.insert(columnIndex, rowIndex, 0);
 
-                calculateWegMatrix();
+                calculateWegMatrix(tempMatrix);
 
                 newComponents = findComponents(wegMatrix);
 
@@ -208,25 +208,26 @@ public class Graph {
                     bridges.add(bridge);
                 }
 
-                adjazenzMatrix = new Matrix(file);
+                tempMatrix = adjazenzMatrix.clone();
             }
         }
-        calculateWegMatrix();
+        calculateWegMatrix(adjazenzMatrix);
     }
 
-    public void findArticulations(String file) {
+    public void findArticulations() {
+        Matrix tempMatrix = adjazenzMatrix.clone();
         articulations = new ArrayList<>(1);
         ArrayList<ArrayList<Integer>> newComponents;
 
-        for(int i = 0; i < adjazenzMatrix.getRowLength(); i++) {
-            for(int rowIndex = 0; rowIndex < adjazenzMatrix.getRowLength(); rowIndex++) {
-                for(int columnIndex = 0; columnIndex < adjazenzMatrix.getColumnLength(); columnIndex++) {
-                    adjazenzMatrix.insert(rowIndex, i, 0);
-                    adjazenzMatrix.insert(i, columnIndex, 0);
+        for(int i = 0; i < tempMatrix.getRowLength(); i++) {
+            for(int rowIndex = 0; rowIndex < tempMatrix.getRowLength(); rowIndex++) {
+                for(int columnIndex = 0; columnIndex < tempMatrix.getColumnLength(); columnIndex++) {
+                    tempMatrix.insert(rowIndex, i, 0);
+                    tempMatrix.insert(i, columnIndex, 0);
                 }
             }
 
-            calculateWegMatrix();
+            calculateWegMatrix(tempMatrix);
 
             newComponents = findComponents(wegMatrix);
     
@@ -234,9 +235,9 @@ public class Graph {
                 articulations.add(i + 1);
             }
 
-            adjazenzMatrix = new Matrix(file);
+            tempMatrix = adjazenzMatrix.clone();
         }
-        calculateWegMatrix();
+        calculateWegMatrix(adjazenzMatrix);
     }
 
     public String toString() {
@@ -279,7 +280,10 @@ public class Graph {
         }   
         s += "}";
 
-        s += "\nArtikulationen: " + articulations.toString();
+        s += "\nArtikulationen: ";
+        if(articulations != null)
+            s += articulations.toString();
+
         return s;
     }
 }

@@ -95,7 +95,7 @@ public class Matrix {
         }
     }
 
-    public int[][] clone() {
+    public Matrix clone() {
         int[][] clone = new int[rowLength][columnLength];
 
         for(int columnIndex=0; columnIndex < columnLength; columnIndex++) {
@@ -104,7 +104,7 @@ public class Matrix {
             }
         }
 
-        return clone;
+        return new Matrix(clone);
     }
 
     public void randomAdjazenzMatrix() {
